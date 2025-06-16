@@ -1,0 +1,12 @@
+[dev]
+dev-server ansible_host=10.0.1.10 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/dev-key.pem
+
+[preprod]
+preprod-server ansible_host=10.0.2.10 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/preprod-key.pem
+
+[prod]
+prod-server-1 ansible_host=10.0.3.10 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/prod-key.pem
+prod-server-2 ansible_host=10.0.3.11 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/prod-key.pem
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

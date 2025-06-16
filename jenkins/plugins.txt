@@ -1,0 +1,15 @@
+ant:latest
+build-timeout:latest
+credentials-binding:latest
+docker-plugin:latest
+docker-workflow:latest
+git:latest
+github:latest
+pipeline-stage-view:latest
+ssh-agent:latest
+timestamper:latest
+workflow-aggregator:latest
+ansible:latest
+pipeline-utility-steps:latest
+email-ext:latest
+slack:latest

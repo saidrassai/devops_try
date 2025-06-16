@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.production
+*.env
+
+# Docker
+docker-compose.override.yml
+*.tar.gz
+
+# SSH Keys
+*.pem
+*.key
+id_rsa*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Build artifacts
+dist/
+build/
+
+# Ansible
+ansible/vault.yml
+ansible/*.retry
+
+# Jenkins
+jenkins/secrets/
+jenkins/workspace/
+
+# AWS
+.aws/
+*.tfstate
+*.tfstate.backup
+
+# Monitoring
+grafana/data/
+prometheus/data/

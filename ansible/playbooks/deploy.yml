@@ -1,0 +1,93 @@
+---
+- name: Deploy Application Infrastructure
+  hosts: all
+  become: yes
+  vars:
+    docker_image: "devops-sample-app"
+    docker_tag: "{{ docker_tag | default('latest') }}"
+    app_name: "devops-app"
+    
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+        
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - git
+          - curl
+          - unzip
+        state: present
+        
+    - name: Start and enable Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+        
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+        
+    - name: Create application directory
+      file:
+        path: "/opt/{{ app_name }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+        
+    - name: Copy Docker Compose file
+      template:
+        src: ../templates/docker-compose.yml.j2
+        dest: "/opt/{{ app_name }}/docker-compose.yml"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+        
+    - name: Copy Nginx configuration
+      template:
+        src: ../templates/nginx.conf.j2
+        dest: "/opt/{{ app_name }}/nginx.conf"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+        
+    - name: Create environment file
+      template:
+        src: ../templates/.env.j2
+        dest: "/opt/{{ app_name }}/.env"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+        
+    - name: Pull Docker image
+      docker_image:
+        name: "{{ docker_image }}:{{ docker_tag }}"
+        source: pull
+      when: docker_tag != 'latest'
+      
+    - name: Stop existing containers
+      docker_compose:
+        project_src: "/opt/{{ app_name }}"
+        state: absent
+      ignore_errors: yes
+      
+    - name: Start application containers
+      docker_compose:
+        project_src: "/opt/{{ app_name }}"
+        state: present
+        
+    - name: Wait for application to be ready
+      uri:
+        url: "http://localhost:{{ nginx_port }}/health"
+        method: GET
+        status_code: 200
+      retries: 30
+      delay: 5

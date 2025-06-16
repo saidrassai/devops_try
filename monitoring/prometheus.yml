@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'devops-app-dev'
+    static_configs:
+      - targets: ['YOUR_DEV_SERVER_IP:3000']
+    scrape_interval: 30s
+
+  - job_name: 'devops-app-preprod'
+    static_configs:
+      - targets: ['YOUR_PREPROD_SERVER_IP:3000']
+    scrape_interval: 30s
+
+  - job_name: 'devops-app-prod'
+    static_configs:
+      - targets: ['YOUR_PROD_SERVER_IP_1:3000', 'YOUR_PROD_SERVER_IP_2:3000']
+    scrape_interval: 30s

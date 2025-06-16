@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Sample App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .info {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DevOps Sample Application</h1>
+        <div class="info">
+            <p><strong>Status:</strong> <span id="status">Loading...</span></p>
+            <p><strong>Environment:</strong> <span id="environment">Loading...</span></p>
+            <p><strong>Version:</strong> <span id="version">Loading...</span></p>
+            <p><strong>Hostname:</strong> <span id="hostname">Loading...</span></p>
+        </div>
+        <a href="/api/users" class="btn">View Users API</a>
+        <a href="/health" class="btn">Health Check</a>
+    </div>
+
+    <script>
+        fetch('/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').textContent = 'Running';
+                document.getElementById('environment').textContent = data.environment;
+                document.getElementById('version').textContent = data.version;
+                document.getElementById('hostname').textContent = data.hostname;
+            })
+            .catch(error => {
+                document.getElementById('status').textContent = 'Error';
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+</html>
