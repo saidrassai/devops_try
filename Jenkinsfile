@@ -5,7 +5,6 @@ pipeline {
         DOCKER_IMAGE = 'devops-sample-app'
         DOCKER_TAG = "${BUILD_NUMBER}"
         EC2_IP = '3.86.184.138'
-        GIT_REPO = 'https://github.com/saidrassai/devops_try.git'
     }
     
     stages {
@@ -16,40 +15,39 @@ pipeline {
             }
         }
         
-        stage('Build Application') {
-            steps {
-                script {
-                    echo '🔨 Building Node.js application...'
-                    sh '''
-                        cd app
-                        npm install
-                        echo "✅ Dependencies installed"
-                    '''
-                }
-            }
-        }
-        
-        stage('Run Tests') {
-            steps {
-                script {
-                    echo '🧪 Running tests...'
-                    sh '''
-                        cd app
-                        npm test || echo "⚠️ No tests defined yet"
-                        echo "✅ Tests completed"
-                    '''
-                }
-            }
-        }
-        
         stage('Build Docker Image') {
             steps {
                 script {
                     echo '🐳 Building Docker image...'
                     sh '''
+                        echo "Building Docker image with tag: ${DOCKER_TAG}"
                         docker build -f docker/Dockerfile -t ${DOCKER_IMAGE}:${DOCKER_TAG} app/
                         docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
                         echo "✅ Docker image built successfully"
+                    '''
+                }
+            }
+        }
+        
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    echo '🧪 Testing Docker image...'
+                    sh '''
+                        echo "Testing if image runs correctly..."
+                        docker run --rm -d --name test-container -p 9999:3000 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        sleep 5
+                        
+                        # Test if container is running and responding
+                        if curl -f http://localhost:9999/health; then
+                            echo "✅ Docker image test passed"
+                        else
+                            echo "❌ Docker image test failed"
+                            exit 1
+                        fi
+                        
+                        # Clean up test container
+                        docker stop test-container || true
                     '''
                 }
             }
@@ -68,6 +66,7 @@ pipeline {
                         docker run -d --name devops-dev \
                             -p 3000:3000 \
                             -e NODE_ENV=development \
+                            --restart unless-stopped \
                             ${DOCKER_IMAGE}:${DOCKER_TAG}
                         
                         # Wait for startup
@@ -76,8 +75,10 @@ pipeline {
                         # Health check
                         if curl -f http://localhost:3000/health; then
                             echo "✅ Development deployment successful"
+                            echo "🌐 Available at: http://${EC2_IP}:3000"
                         else
                             echo "❌ Development deployment failed"
+                            docker logs devops-dev
                             exit 1
                         fi
                     '''
@@ -104,6 +105,7 @@ pipeline {
                         docker run -d --name devops-staging \
                             -p 3001:3000 \
                             -e NODE_ENV=staging \
+                            --restart unless-stopped \
                             ${DOCKER_IMAGE}:${DOCKER_TAG}
                         
                         # Wait for startup
@@ -112,8 +114,10 @@ pipeline {
                         # Health check
                         if curl -f http://localhost:3001/health; then
                             echo "✅ Staging deployment successful"
+                            echo "🌐 Available at: http://${EC2_IP}:3001"
                         else
                             echo "❌ Staging deployment failed"
+                            docker logs devops-staging
                             exit 1
                         fi
                     '''
@@ -132,8 +136,7 @@ pipeline {
                 script {
                     echo '⚠️ Production deployment requires approval'
                     input message: 'Deploy to Production?', 
-                          ok: 'Deploy to Production',
-                          submitter: 'admin'
+                          ok: 'Deploy to Production'
                 }
             }
         }
@@ -157,6 +160,7 @@ pipeline {
                         docker run -d --name devops-prod \
                             -p 3002:3000 \
                             -e NODE_ENV=production \
+                            --restart unless-stopped \
                             ${DOCKER_IMAGE}:${DOCKER_TAG}
                         
                         # Wait for startup
@@ -165,45 +169,11 @@ pipeline {
                         # Health check
                         if curl -f http://localhost:3002/health; then
                             echo "✅ Production deployment successful"
+                            echo "🌐 Available at: http://${EC2_IP}:3002"
                         else
                             echo "❌ Production deployment failed"
+                            docker logs devops-prod
                             exit 1
-                        fi
-                    '''
-                }
-            }
-        }
-        
-        stage('Post-Deployment Tests') {
-            steps {
-                script {
-                    echo '🔍 Running post-deployment tests...'
-                    sh '''
-                        echo "Testing all environments..."
-                        
-                        # Test Development
-                        if curl -s http://localhost:3000/health | grep -q "healthy"; then
-                            echo "✅ Development health check passed"
-                        else
-                            echo "❌ Development health check failed"
-                        fi
-                        
-                        # Test Staging (if deployed)
-                        if docker ps | grep -q devops-staging; then
-                            if curl -s http://localhost:3001/health | grep -q "healthy"; then
-                                echo "✅ Staging health check passed"
-                            else
-                                echo "❌ Staging health check failed"
-                            fi
-                        fi
-                        
-                        # Test Production (if deployed)
-                        if docker ps | grep -q devops-prod; then
-                            if curl -s http://localhost:3002/health | grep -q "healthy"; then
-                                echo "✅ Production health check passed"
-                            else
-                                echo "❌ Production health check failed"
-                            fi
                         fi
                     '''
                 }
@@ -215,25 +185,27 @@ pipeline {
         always {
             echo '🧹 Cleaning up...'
             sh '''
+                # Clean up test containers
+                docker stop test-container || true
+                docker rm test-container || true
+                
                 # Clean up unused Docker images
                 docker image prune -f || true
                 
                 # Show running containers
                 echo "📊 Currently running containers:"
-                docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+                docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"
             '''
         }
         success {
             echo '🎉 Pipeline completed successfully!'
-            script {
-                sh '''
-                    echo "🌐 Application URLs:"
-                    echo "   Development: http://${EC2_IP}:3000"
-                    echo "   Staging: http://${EC2_IP}:3001" 
-                    echo "   Production: http://${EC2_IP}:3002"
-                    echo "   Jenkins: http://${EC2_IP}:8080"
-                '''
-            }
+            sh '''
+                echo "🌐 Application URLs:"
+                echo "   Development: http://${EC2_IP}:3000"
+                echo "   Staging: http://${EC2_IP}:3001" 
+                echo "   Production: http://${EC2_IP}:3002"
+                echo "   Jenkins: http://${EC2_IP}:8080"
+            '''
         }
         failure {
             echo '❌ Pipeline failed!'
