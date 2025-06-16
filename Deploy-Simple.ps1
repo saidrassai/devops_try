@@ -7,7 +7,7 @@ param(
     [string]$Environment = "dev"
 )
 
-$EC2_IP = "3.86.184.138"
+$EC2_IP = "52.91.251.180"
 $EC2_USER = "ubuntu"
 $KEY_PATH = "C:\Users\PC\Downloads\DevSecOps_jenkins.pem"
 

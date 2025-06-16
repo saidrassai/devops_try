@@ -84,11 +84,10 @@ if (Test-Path $keyPath) {
     Set-Acl -Path $keyPath -AclObject $acl
     
     Write-Host "✅ Permissions set correctly" -ForegroundColor Green
-    
-    # Test SSH connection
+      # Test SSH connection
     Write-Host ""
     Write-Host "🧪 Testing SSH connection to EC2..." -ForegroundColor Yellow
-    $EC2_IP = "3.86.184.138"
+    $EC2_IP = "52.91.251.180"
     
     try {
         ssh -i $keyPath -o ConnectTimeout=10 -o StrictHostKeyChecking=no "ubuntu@$EC2_IP" "echo 'SSH test successful'" 2>$null | Out-Null

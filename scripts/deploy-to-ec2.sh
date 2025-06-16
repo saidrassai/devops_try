@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Quick deployment script for EC2 instance i-0e605f03f8a4d2420
-# Public IP: 3.86.184.138
+# Public IP: 52.91.251.180
 # Private IP: 172.31.93.22
 
 set -e
 
 ENVIRONMENT=${1:-dev}
-EC2_IP="3.86.184.138"
+EC2_IP="52.91.251.180"
 EC2_USER="ubuntu"
 KEY_PATH="~/.ssh/devops-key.pem"
 

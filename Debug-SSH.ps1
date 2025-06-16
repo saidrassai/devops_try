@@ -1,6 +1,6 @@
 # Debug SSH connection
 
-$EC2_IP = "3.86.184.138"
+$EC2_IP = "52.91.251.180"
 $KEY_PATH = "C:\Users\PC\Downloads\DevSecOps_jenkins.pem"
 
 Write-Host "🔍 Debugging SSH connection to EC2" -ForegroundColor Yellow

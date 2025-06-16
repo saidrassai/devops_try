@@ -48,7 +48,7 @@ devops_try/
 
 ## 🌐 **Target Environment**
 - **EC2 Instance**: i-0e605f03f8a4d2420
-- **Public IP**: 3.86.184.138
+- **Public IP**: 52.91.251.180
 - **Multi-Environment Setup**: dev/preprod/prod
 
 ## 🚀 **Next Steps for Deployment**
@@ -70,9 +70,9 @@ devops_try/
 3. Test endpoints
 
 ## 🎯 **Application URLs (After Deployment)**
-- **Main Application**: http://3.86.184.138:3000
-- **Health Check**: http://3.86.184.138:3000/health  
-- **API Endpoint**: http://3.86.184.138:3000/api/users
+- **Main Application**: http://52.91.251.180:3000
+- **Health Check**: http://52.91.251.180:3000/health  
+- **API Endpoint**: http://52.91.251.180:3000/api/users
 
 ## 🔧 **Professional Features Included**
 - ✅ Multi-environment support (dev/preprod/prod)

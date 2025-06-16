@@ -7,7 +7,7 @@ param(
     [string]$Environment = "dev"
 )
 
-$EC2_IP = "3.86.184.138"
+$EC2_IP = "52.91.251.180"
 $EC2_USER = "ubuntu"
 $KEY_PATH = "C:\Users\PC\Downloads\DevSecOps_jenkins.pem"
 
@@ -178,7 +178,7 @@ sleep 15
 echo "🔍 Performing health check..."
 if curl -f http://localhost:`$PORT/health > /dev/null 2>&1; then
     echo "✅ Application deployed successfully!"
-    echo "🌐 Access at: http://3.86.184.138:`$PORT"
+    echo "🌐 Access at: http://52.91.251.180:`$PORT"
 else
     echo "❌ Health check failed. Checking logs..."
     docker-compose logs

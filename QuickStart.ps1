@@ -4,7 +4,7 @@
 Write-Host "🚀 DevSecOps Infrastructure - Quick Start" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 
-$EC2_IP = "3.86.184.138"
+$EC2_IP = "52.91.251.180"
 $INSTANCE_ID = "i-0e605f03f8a4d2420"
 
 Write-Host ""

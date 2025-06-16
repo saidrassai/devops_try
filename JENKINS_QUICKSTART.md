@@ -1,12 +1,12 @@
 # Quick Jenkins Pipeline Setup for DevSecOps
 
 ## 🎯 Access Jenkins
-**Jenkins URL**: http://3.86.184.138:8080/
+**Jenkins URL**: http://52.91.251.180:8080/
 
 ## 📋 Step-by-Step Setup
 
 ### Step 1: Access Jenkins
-1. Open browser and go to: http://3.86.184.138:8080/
+1. Open browser and go to: http://52.91.251.180:8080/
 2. If this is first time, get admin password from EC2:
    ```bash
    sudo cat /var/lib/jenkins/secrets/initialAdminPassword
@@ -53,10 +53,10 @@ In the job configuration:
 8. **Deploy Prod** → Deploys to production (port 3002) after approval
 
 ### Environment URLs After Pipeline:
-- **Development**: http://3.86.184.138:3000
-- **Staging**: http://3.86.184.138:3001  
-- **Production**: http://3.86.184.138:3002
-- **Jenkins Dashboard**: http://3.86.184.138:8080
+- **Development**: http://52.91.251.180:3000
+- **Staging**: http://52.91.251.180:3001  
+- **Production**: http://52.91.251.180:3002
+- **Jenkins Dashboard**: http://52.91.251.180:8080
 
 ## 🔧 Required Jenkins Plugins
 

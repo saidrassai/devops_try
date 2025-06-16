@@ -2,7 +2,7 @@
 
 ## EC2 Instance Details
 - **Instance ID**: i-0e605f03f8a4d2420 (DevSecops_Project)
-- **Public IP**: 3.86.184.138
+- **Public IP**: 52.91.251.180
 - **Private IP**: 172.31.93.22
 - **Environment**: Multi-environment setup (dev/preprod/prod)
 
@@ -40,16 +40,16 @@ cd "C:\Users\PC\Desktop\devops_try"
 ### Step 3: Setup Jenkins CI/CD (20 minutes)
 ```bash
 # SSH to your EC2 instance
-ssh -i ~/.ssh/devops-key.pem ubuntu@3.86.184.138
+ssh -i ~/.ssh/devops-key.pem ubuntu@52.91.251.180
 
 # Run Jenkins setup script
 curl -sSL https://raw.githubusercontent.com/saidrassai/devops_try/main/scripts/setup-jenkins.sh | bash
 
-# Access Jenkins at: http://3.86.184.138:8080
+# Access Jenkins at: http://52.91.251.180:8080
 ```
 
 ### Step 4: Configure Jenkins Pipeline (10 minutes)
-1. Access Jenkins: `http://3.86.184.138:8080`
+1. Access Jenkins: `http://52.91.251.180:8080`
 2. Get initial password: `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
 3. Install suggested plugins
 4. Create admin user
@@ -60,31 +60,31 @@ curl -sSL https://raw.githubusercontent.com/saidrassai/devops_try/main/scripts/s
 ### Step 5: Test and Verify (5 minutes)
 ```bash
 # Test each environment
-curl http://3.86.184.138/health          # Development
-curl http://3.86.184.138:8080/health     # Preproduction  
-curl http://3.86.184.138:9000/health     # Production
+curl http://52.91.251.180/health          # Development
+curl http://52.91.251.180:8080/health     # Preproduction  
+curl http://52.91.251.180:9000/health     # Production
 ```
 
 ## Environment Access URLs
 
 ### Development Environment
-- **Application**: http://3.86.184.138
-- **Health Check**: http://3.86.184.138/health
-- **API**: http://3.86.184.138/api/users
+- **Application**: http://52.91.251.180
+- **Health Check**: http://52.91.251.180/health
+- **API**: http://52.91.251.180/api/users
 
 ### Preproduction Environment
-- **Application**: http://3.86.184.138:8080
-- **Health Check**: http://3.86.184.138:8080/health
-- **API**: http://3.86.184.138:8080/api/users
+- **Application**: http://52.91.251.180:8080
+- **Health Check**: http://52.91.251.180:8080/health
+- **API**: http://52.91.251.180:8080/api/users
 
 ### Production Environment
-- **Application**: http://3.86.184.138:9000
-- **Health Check**: http://3.86.184.138:9000/health
-- **API**: http://3.86.184.138:9000/api/users
+- **Application**: http://52.91.251.180:9000
+- **Health Check**: http://52.91.251.180:9000/health
+- **API**: http://52.91.251.180:9000/api/users
 
 ### Jenkins
-- **URL**: http://3.86.184.138:8080
-- **Blue Ocean**: http://3.86.184.138:8080/blue
+- **URL**: http://52.91.251.180:8080
+- **Blue Ocean**: http://52.91.251.180:8080/blue
 
 ## Security Group Configuration
 
@@ -101,9 +101,8 @@ Ensure your EC2 security group allows these ports:
    ```bash
    # Check key permissions
    chmod 400 ~/.ssh/devops-key.pem
-   
-   # Test connection
-   ssh -i ~/.ssh/devops-key.pem ubuntu@3.86.184.138
+     # Test connection
+   ssh -i ~/.ssh/devops-key.pem ubuntu@52.91.251.180
    ```
 
 2. **Docker Build Failed**
@@ -116,12 +115,11 @@ Ensure your EC2 security group allows these ports:
    ```
 
 3. **Application Not Accessible**
-   ```bash
-   # Check if containers are running
-   ssh -i ~/.ssh/devops-key.pem ubuntu@3.86.184.138 "docker ps"
+   ```bash   # Check if containers are running
+   ssh -i ~/.ssh/devops-key.pem ubuntu@52.91.251.180 "docker ps"
    
    # Check logs
-   ssh -i ~/.ssh/devops-key.pem ubuntu@3.86.184.138 "cd /opt/devops-app && docker-compose logs"
+   ssh -i ~/.ssh/devops-key.pem ubuntu@52.91.251.180 "cd /opt/devops-app && docker-compose logs"
    ```
 
 ## Architecture Overview
@@ -138,10 +136,9 @@ Ensure your EC2 security group allows these ports:
                     │     Jenkins CI/CD   │
                     │     Port: 8080      │
                     └─────────────────────┘
-                                 │
-                    ┌─────────────────────┐
+                                 │                    ┌─────────────────────┐
                     │    EC2 Instance     │
-                    │  3.86.184.138       │
+                    │  52.91.251.180      │
                     │ i-0e605f03f8a4d2420 │
                     └─────────────────────┘
 ```

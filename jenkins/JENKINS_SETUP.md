@@ -1,7 +1,7 @@
 # Jenkins Configuration for DevSecOps Pipeline
 
 ## 🎯 Jenkins Access
-- **URL**: http://3.86.184.138:8080/
+- **URL**: http://52.91.251.180:8080/
 - **Instance**: i-0e605f03f8a4d2420
 
 ## 🔧 Initial Setup Steps
@@ -22,7 +22,7 @@ Install these plugins via Jenkins UI (Manage Jenkins → Manage Plugins):
 
 ### 3. Create Pipeline Job
 
-1. **Go to Jenkins**: http://3.86.184.138:8080/
+1. **Go to Jenkins**: http://52.91.251.180:8080/
 2. **Click "New Item"**
 3. **Enter name**: `devops-pipeline`
 4. **Select**: "Pipeline"
@@ -49,10 +49,10 @@ Our Jenkins pipeline will:
 - ✅ Rollback capability
 
 ## 🌐 Environment URLs After Pipeline
-- **Development**: http://3.86.184.138:3000
-- **Staging**: http://3.86.184.138:3001
-- **Production**: http://3.86.184.138:3002
-- **Jenkins**: http://3.86.184.138:8080
+- **Development**: http://52.91.251.180:3000
+- **Staging**: http://52.91.251.180:3001
+- **Production**: http://52.91.251.180:3002
+- **Jenkins**: http://52.91.251.180:8080
 
 ## 📋 Next Steps
 1. Access Jenkins at the URL above

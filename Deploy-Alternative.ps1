@@ -83,7 +83,7 @@ nohup node server.js > app.log 2>&1 &
 sleep 5
 curl http://localhost:3000/health
 
-echo "Application deployed! Access at: http://3.86.184.138:3000"
+echo "Application deployed! Access at: http://52.91.251.180:3000"
 "@ -ForegroundColor White
 
 Write-Host ""
@@ -105,9 +105,9 @@ Write-Host "- Port 80 (HTTP) from 0.0.0.0/0"
 Write-Host ""
 Write-Host "🎯 Quick Test" -ForegroundColor Green
 Write-Host "After deployment, test these URLs:"
-Write-Host "🌐 Main App: http://3.86.184.138:3000" -ForegroundColor Cyan
-Write-Host "📊 Health: http://3.86.184.138:3000/health" -ForegroundColor Cyan  
-Write-Host "🔧 API: http://3.86.184.138:3000/api/users" -ForegroundColor Cyan
+Write-Host "🌐 Main App: http://52.91.251.180:3000" -ForegroundColor Cyan
+Write-Host "📊 Health: http://52.91.251.180:3000/health" -ForegroundColor Cyan  
+Write-Host "🔧 API: http://52.91.251.180:3000/api/users" -ForegroundColor Cyan
 
 Write-Host ""
 Write-Host "💡 The Session Manager method is the most reliable!" -ForegroundColor Yellow

@@ -3,7 +3,7 @@
 # Test script for DevSecOps infrastructure
 # Tests all environments on EC2 instance
 
-EC2_IP="3.86.184.138"
+EC2_IP="52.91.251.180"
 ENVIRONMENTS=("dev:80" "preprod:8080" "prod:9000")
 
 echo "🧪 Testing DevSecOps Infrastructure on EC2: $EC2_IP"
