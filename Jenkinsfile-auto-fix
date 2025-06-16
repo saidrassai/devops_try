@@ -1,0 +1,252 @@
+# Jenkins Pipeline Auto-Fix for Node.js Installation
+# Updated Jenkinsfile that automatically installs Node.js if missing
+
+pipeline {
+    agent any
+    
+    environment {
+        NODE_VERSION = '18'
+        BUILD_DIR = 'app'
+    }
+    
+    stages {
+        stage('System Setup') {
+            steps {
+                script {
+                    echo '🔧 Checking and installing prerequisites...'
+                    
+                    // Check if Node.js is installed
+                    def nodeExists = sh(script: 'which node', returnStatus: true) == 0
+                    
+                    if (!nodeExists) {
+                        echo '📦 Node.js not found. Installing Node.js ${NODE_VERSION} LTS...'
+                        sh '''
+                            # Install Node.js 18 LTS
+                            curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+                            sudo yum install -y nodejs
+                            
+                            # Set up Jenkins npm permissions
+                            sudo mkdir -p /var/lib/jenkins/.npm
+                            sudo chown jenkins:jenkins /var/lib/jenkins/.npm
+                            sudo chmod 755 /var/lib/jenkins/.npm
+                            
+                            # Update npm to latest version
+                            sudo npm install -g npm@latest
+                            
+                            # Verify installation
+                            echo "Node.js version: $(node --version)"
+                            echo "npm version: $(npm --version)"
+                        '''
+                        echo '✅ Node.js installation completed!'
+                    } else {
+                        echo '✅ Node.js already installed'
+                        sh 'node --version && npm --version'
+                    }
+                }
+            }
+        }
+        
+        stage('Checkout') {
+            steps {
+                echo '📁 Checking out source code...'
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir(BUILD_DIR) {
+                    echo '📦 Installing Node.js dependencies...'
+                    sh '''
+                        # Ensure we're using the Jenkins user's npm config
+                        export HOME=/var/lib/jenkins
+                        npm ci --only=production --silent
+                    '''
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                dir(BUILD_DIR) {
+                    echo '🧪 Running tests...'
+                    script {
+                        // Run tests if test script exists
+                        def testScriptExists = sh(script: 'grep -q \'"test"\' package.json', returnStatus: true) == 0
+                        if (testScriptExists) {
+                            sh 'npm test'
+                        } else {
+                            echo '⚠️ No test script found in package.json'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Build Application') {
+            steps {
+                dir(BUILD_DIR) {
+                    echo '🔨 Building application...'
+                    script {
+                        // Check if build script exists
+                        def buildScriptExists = sh(script: 'grep -q \'"build"\' package.json', returnStatus: true) == 0
+                        if (buildScriptExists) {
+                            sh 'npm run build'
+                        } else {
+                            echo '📝 No build script found. Application ready for deployment.'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to Development') {
+            steps {
+                echo '🚀 Deploying to Development environment...'
+                sh '''
+                    # Stop existing development application
+                    pkill -f "node.*server.js" || true
+                    
+                    # Start development application
+                    cd app
+                    export NODE_ENV=development
+                    export PORT=3000
+                    nohup node server.js > /tmp/dev-app.log 2>&1 &
+                    
+                    # Wait for application to start
+                    sleep 5
+                    
+                    # Health check
+                    curl -f http://localhost:3000/health || {
+                        echo "❌ Development deployment failed"
+                        exit 1
+                    }
+                    
+                    echo "✅ Development deployment successful"
+                '''
+            }
+        }
+        
+        stage('Deploy to Staging') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                echo '🎭 Deploying to Staging environment...'
+                sh '''
+                    # Stop existing staging application
+                    pkill -f "PORT=3001.*node.*server.js" || true
+                    
+                    # Start staging application
+                    cd app
+                    export NODE_ENV=staging
+                    export PORT=3001
+                    nohup node server.js > /tmp/staging-app.log 2>&1 &
+                    
+                    # Wait for application to start
+                    sleep 5
+                    
+                    # Health check
+                    curl -f http://localhost:3001/health || {
+                        echo "❌ Staging deployment failed"
+                        exit 1
+                    }
+                    
+                    echo "✅ Staging deployment successful"
+                '''
+            }
+        }
+        
+        stage('Production Approval') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                echo '⏸️ Waiting for production deployment approval...'
+                input(
+                    message: 'Deploy to Production?',
+                    ok: 'Deploy',
+                    submitterParameter: 'APPROVER'
+                )
+                echo "✅ Production deployment approved by: ${APPROVER}"
+            }
+        }
+        
+        stage('Deploy to Production') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'master'
+                }
+            }
+            steps {
+                echo '🏭 Deploying to Production environment...'
+                sh '''
+                    # Stop existing production application
+                    pkill -f "PORT=3002.*node.*server.js" || true
+                    
+                    # Start production application
+                    cd app
+                    export NODE_ENV=production
+                    export PORT=3002
+                    nohup node server.js > /tmp/prod-app.log 2>&1 &
+                    
+                    # Wait for application to start
+                    sleep 5
+                    
+                    # Health check
+                    curl -f http://localhost:3002/health || {
+                        echo "❌ Production deployment failed"
+                        exit 1
+                    }
+                    
+                    echo "✅ Production deployment successful"
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo '🧹 Cleaning up workspace...'
+            cleanWs()
+        }
+        success {
+            echo '🎉 Pipeline completed successfully!'
+            script {
+                def deploymentSummary = """
+                    🚀 DevSecOps Deployment Summary:
+                    
+                    ✅ Development: http://52.91.251.180:3000
+                    ✅ Staging: http://52.91.251.180:3001  
+                    ✅ Production: http://52.91.251.180:3002
+                    
+                    🔧 Jenkins: http://52.91.251.180:8080
+                    
+                    All environments are running successfully! 🎯
+                """
+                echo deploymentSummary
+            }
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+            script {
+                sh '''
+                    echo "📊 Debug Information:"
+                    echo "Node.js version: $(node --version 2>/dev/null || echo 'Not installed')"
+                    echo "npm version: $(npm --version 2>/dev/null || echo 'Not installed')"
+                    echo "Jenkins user: $(whoami)"
+                    echo "Working directory: $(pwd)"
+                    echo "Environment variables:"
+                    env | grep -E "(NODE|NPM|PATH)" || true
+                '''
+            }
+        }
+    }
+}
