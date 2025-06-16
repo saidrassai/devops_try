@@ -85,14 +85,7 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy to Staging') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
+          stage('Deploy to Staging') {
             steps {
                 script {
                     echo '🎭 Deploying to Staging environment...'
@@ -122,35 +115,12 @@ pipeline {
                         fi
                     '''
                 }
-            }
-        }
-        
-        stage('Approval for Production') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
-            steps {
-                script {
-                    echo '⚠️ Production deployment requires approval'
-                    input message: 'Deploy to Production?', 
-                          ok: 'Deploy to Production'
-                }
-            }
-        }
+            }        }
         
         stage('Deploy to Production') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
-            steps {
-                script {
+            steps {                script {
                     echo '🏭 Deploying to Production environment...'
+                    echo '⚠️ Auto-deploying to production for demo purposes'
                     sh '''
                         # Stop existing production containers
                         docker stop devops-prod || true
